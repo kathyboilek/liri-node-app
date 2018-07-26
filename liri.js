@@ -2,24 +2,41 @@ var dotenv = require('dotenv').config;
 
 
 // Add the code required to import the `keys.js` file
+var SpotifyWebApi = require('spotify-web-api-node');
+// var TweetWebApi = require('twitter');
 var keys = require('./keys.js');
-var twitter = require('twitter');
-var Spotify = require('node-spotify-api');
-var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+var spotifyApi = new SpotifyWebApi(keys.spotify);
+// var client = new TweetWebApi(keys.twitter);
+
+
 
 //and store it in a variable.
 var nodeArgv = process.argv;
 var command = process.argv[2];
+
+var x = "";
+//attaches multiple word arguments
+for (var i=3; i < nodeArgv.length; i++){
+  if(i>3 && i<nodeArgv.length){
+    x = x + "+" + nodeArgv[i];
+  } else{
+    x = x + nodeArgv[i];
+  }
+}
+
+fs.catch((error) => {
+  assert.isNotOk(error,'Promise error');
+});
+
 
 // Grab the fs package to handle read/write.
 var fs = require("fs");
 
 // Make it so liri.js can take in the following commands:
 switch(command){
-    case "my-tweets":
-      showTweets();
-    break;
+    // case "my-tweets":
+    //   getMyTweets();
+    // break;
   
     case "spotify-this-song":
       if(x){
@@ -47,28 +64,40 @@ switch(command){
     break;
   }
   
-  function showTweets(){
-    // This will show your last 20 tweets and when they were created at in your terminal/bash window.
-    var screenName = {screen_name: 'brwneyes'};
-    client.get('statuses/user_timeline', screenName, function(error, tweets, response){
-      if(!error){
-        for(var i = 0; i<tweets.length; i++){
-          var date = tweets[i].created_at;
-          console.log("@brwneyes: " + tweets[i].text + " Created At: " + date.substring(0, 19));
-          console.log("-----------------------");
-          
-          //adds text to log.txt file
-          fs.appendFile('log.txt', "@brwneyes: " + tweets[i].text + " Created At: " + date.substring(0, 19));
-          fs.appendFile('log.txt', "-----------------------");
-        }
-      }else{
-        console.log('Error occurred');
-      }
-    });
-  }
+    // function getMyTweets() {
+    //   $ twurl "/1.1/statuses/user_timeline.json";
+    
+    //   // Search parameters includes my tweets up to last 20 tweets;
+    //   var params = {q: '@brwneyes', count: 20};
+    
+    //   // Shows up to last 20 tweets and when created in terminal.
+    //   client.get('search/tweets', params, function(error, tweets, response) {
+    //     if (!error) {
+    
+    //       // Loops through tweets and prints out tweet text and creation date.
+    //       for (var i = 0; i < tweets.statuses.length; i++) {
+    //         var tweetText = tweets.statuses[i].text;
+    //         console.log("Tweet Text: " + tweetText);
+    //         var tweetCreationDate = tweets.statuses[i].created_at;
+    //         console.log("Tweet Creation Date: " + tweetCreationDate);
+    //       }
+    //     } else {
+    //       console.log(error);
+    //     }
+    //   });
+
+  //   client.get('statuses/user_timeline', { screen_name: 'brwneyes', count: 20 }, function(error, tweets, response) {
+  //     if (!error && response.statusCode == 200) {
+  //       ('index', { tweets: tweets });
+  //       console.log("@brwneyes5: " + tweets.text);
+  //     }else{
+  //       console.log('Error occurred');
+  // }
+  //   });
+  // }
 
   function spotifySong(song){
-    spotify.search({ type: 'track', query: song}, function(error, data){
+    spotifyApi.searchTracks({ type: 'track', query: song}, function(error, data){
       if(!error){
         for(var i = 0; i < data.tracks.items.length; i++){
           var songData = data.tracks.items[i];
@@ -98,8 +127,6 @@ switch(command){
 // Then run a request to the OMDB API with the movie 
 // This will output the following information to your terminal/bash window
 function omdbData(movie){
-    // Include the request npm package (Don't forget to run "npm install request" in this folder first!)
-    var request = require("request");
 
     var omdbURL = 'http://www.omdbapi.com/?t=' + movie + '&plot=short&tomatoes=true&apikey=trilogy';
   
@@ -158,4 +185,8 @@ function doThing(){
           spotifySong(txt[1]);
     });
 }
+
+
+
+
 
